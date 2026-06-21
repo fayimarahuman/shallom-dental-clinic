@@ -1,0 +1,41 @@
+# Secrets — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+.Python
+
+# Databases / local data dumps
+*.sqlite3
+*.db
+*.sql.gz
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large/raw data and archives — keep these out of git, store separately
+archive.zip
+archive/
+*.csv
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Streamlit local config/secrets (if you ever use .streamlit/secrets.toml)
+.streamlit/secrets.toml
+
+# Logs
+*.log
