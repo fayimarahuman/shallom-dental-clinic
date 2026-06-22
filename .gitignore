@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Streamlit secrets (real credentials — set on Streamlit Cloud dashboard instead)
+.streamlit/secrets.toml
+
 # Python
 __pycache__/
 *.pyc
@@ -23,7 +26,7 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Large/raw data and archives — keep these out of git, store separately
+# Large/raw data and archives
 archive.zip
 archive/
 *.csv
@@ -33,9 +36,6 @@ archive/
 Thumbs.db
 .vscode/
 .idea/
-
-# Streamlit local config/secrets (if you ever use .streamlit/secrets.toml)
-.streamlit/secrets.toml
 
 # Logs
 *.log
