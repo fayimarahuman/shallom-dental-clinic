@@ -2,6 +2,7 @@
 import base64
 from pathlib import Path
 import streamlit as st
+import streamlit.components.v1 as components
 from utils.db import init_database
 from utils.auth import init_auth_table, login_user
 from utils.permissions import can_view_page, get_allowed_pages
@@ -27,6 +28,27 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ── Auto-dismiss the "Bad message format / SessionInfo" frontend popup ──
+# This is a known Streamlit frontend race condition triggered by slow
+# cold starts (Streamlit Cloud + Neon waking up). It doesn't affect app
+# logic, but auto-clicking it keeps it from being visible to users.
+components.html("""
+<script>
+const observer = new MutationObserver(() => {
+    const buttons = window.parent.document.querySelectorAll('button');
+    buttons.forEach(btn => {
+        if (btn.innerText.trim() === 'OK' || btn.innerText.trim() === 'Close') {
+            const dialogText = btn.closest('div')?.innerText || '';
+            if (dialogText.includes('SessionInfo') || dialogText.includes('Bad message format')) {
+                btn.click();
+            }
+        }
+    });
+});
+observer.observe(window.parent.document.body, { childList: true, subtree: true });
+</script>
+""", height=0)
 
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
