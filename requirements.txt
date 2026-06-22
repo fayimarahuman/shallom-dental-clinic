@@ -1,10 +1,10 @@
 streamlit==1.41.1
-pandas==2.2.2
-numpy==1.26.4
+pandas==2.2.3
+numpy==2.2.4
+psycopg2-binary==2.9.10
 bcrypt==4.0.1
-plotly==5.18.0
+plotly==6.0.1
 joblib==1.4.2
-scikit-learn==1.4.2
-pillow==10.4.0
-python-dotenv==1.0.1
-psycopg[binary]==3.2.9
+scikit-learn==1.6.1
+pillow==11.1.0
+python-dotenv==1.2.2
