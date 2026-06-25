@@ -8,7 +8,7 @@ from utils.audit import log_action
 
 
 def show_patients():
-    st.error("VERSION 25-JUNE-2026 TEST")
+
     st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -287,23 +287,28 @@ def show_patients():
     tab1, tab2, tab3 = st.tabs(["Register", "Records", "Edit / Delete"])
 
     # ── JavaScript to auto-click the correct tab after rerun ─────────────────
-    if active != 0:
-        tab_index = active  # 0-based index
-        st.markdown(f"""
-        <script>
-        (function() {{
-            function clickTab() {{
-                var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
-                if (tabs && tabs.length > {tab_index}) {{
+    # Improved tab restoration - now works for all tabs including Register (tab 0)
+    tab_index = active  # 0-based index
+    st.markdown(f"""
+    <script>
+    (function() {{
+        function clickTab() {{
+            var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
+            if (tabs && tabs.length > {tab_index}) {{
+                // Only click if not already active
+                if (!tabs[{tab_index}].getAttribute('aria-selected') || 
+                    tabs[{tab_index}].getAttribute('aria-selected') !== 'true') {{
                     tabs[{tab_index}].click();
-                }} else {{
-                    setTimeout(clickTab, 100);
                 }}
+            }} else {{
+                setTimeout(clickTab, 100);
             }}
-            setTimeout(clickTab, 80);
-        }})();
-        </script>
-        """, unsafe_allow_html=True)
+        }}
+        // Try after a short delay to ensure tabs are rendered
+        setTimeout(clickTab, 150);
+    }})();
+    </script>
+    """, unsafe_allow_html=True)
 
     # ========== TAB 1 - REGISTER ==========
     with tab1:
