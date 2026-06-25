@@ -8,7 +8,6 @@ from utils.audit import log_action
 
 
 def show_patients():
-
     st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -77,25 +76,52 @@ def show_patients():
             padding: 8px 20px; border-radius: 40px; z-index: 1; letter-spacing: 0.2px;
         }
 
-        /* ── TABS ── */
-        .stTabs [data-baseweb="tab-list"] {
-            background: #fff !important; border-radius: 16px !important;
-            border: 1.5px solid #E2E8F0 !important; padding: 6px 8px !important;
-            gap: 4px !important; margin-bottom: 24px !important;
-            box-shadow: 0 2px 8px rgba(30,74,118,0.06) !important;
+        /* ── CUSTOM TAB BAR (radio styled as tabs) ── */
+        div[data-testid="stHorizontalBlock"].tab-bar-row { margin-bottom: 24px !important; }
+
+        .custom-tab-bar {
+            background: #fff;
+            border-radius: 16px;
+            border: 1.5px solid #E2E8F0;
+            padding: 6px 8px;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(30,74,118,0.06);
         }
-        .stTabs [data-baseweb="tab"] {
-            border-radius: 12px !important; font-size: 13.5px !important;
-            font-weight: 500 !important; color: #6B8FAB !important;
-            padding: 10px 26px !important; transition: color 0.15s !important;
+        .custom-tab {
+            flex: 1; text-align: center;
+            padding: 10px 26px;
+            border-radius: 12px;
+            font-size: 13.5px; font-weight: 500;
+            color: #6B8FAB; cursor: pointer;
+            transition: all 0.15s;
+            border: none; background: transparent;
         }
-        .stTabs [aria-selected="true"] {
-            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
-            color: #fff !important; font-weight: 600 !important;
-            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
+        .custom-tab.active {
+            background: linear-gradient(135deg, #1E4A76, #2D6A9F);
+            color: #fff; font-weight: 600;
+            box-shadow: 0 2px 10px rgba(30,74,118,0.2);
         }
-        .stTabs [data-baseweb="tab-highlight"],
-        .stTabs [data-baseweb="tab-border"] { display: none !important; }
+
+        /* Hide the actual radio widget — we use buttons for tabs */
+        div[data-testid="stHorizontalBlock"] .stButton > button {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 12px !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            color: #6B8FAB !important;
+            padding: 10px 26px !important;
+            box-shadow: none !important;
+            width: 100% !important;
+            transition: all 0.15s !important;
+        }
+        div[data-testid="stHorizontalBlock"] .stButton > button:hover {
+            background: #F0F5FA !important;
+            color: #1E4A76 !important;
+            transform: none !important;
+        }
 
         /* ── SECTION LABELS ── */
         .sec-label {
@@ -127,7 +153,7 @@ def show_patients():
         }
         .stNumberInput > div > div { overflow: hidden !important; }
 
-        /* ── SELECTBOX — comprehensive fix for selected text visibility ── */
+        /* ── SELECTBOX ── */
         .stSelectbox > div > div {
             border: 1.5px solid #E2E8F0 !important;
             border-radius: 12px !important;
@@ -164,8 +190,8 @@ def show_patients():
             font-weight: 600 !important;
         }
 
-        /* ── BUTTONS ── */
-        .stFormSubmitButton button, .stButton button {
+        /* ── FORM SUBMIT BUTTONS (inside forms) ── */
+        .stFormSubmitButton button {
             background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
             border: none !important; border-radius: 12px !important;
             padding: 12px 24px !important; font-weight: 600 !important;
@@ -173,17 +199,29 @@ def show_patients():
             box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
             transition: all 0.2s ease !important;
         }
-        .stFormSubmitButton button:hover, .stButton button:hover {
+        .stFormSubmitButton button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 18px rgba(30,74,118,0.28) !important;
+        }
+
+        /* ── ACTION BUTTONS (outside forms, e.g. confirm delete) ── */
+        .stButton button {
+            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
+            border: none !important; border-radius: 12px !important;
+            padding: 12px 24px !important; font-weight: 600 !important;
+            font-size: 14px !important; color: #fff !important;
+            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
+            transition: all 0.2s ease !important;
+        }
+        .stButton button:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 18px rgba(30,74,118,0.28) !important;
         }
 
         /* ── PATIENT RECORDS TABLE ── */
         .pt-table-wrap {
-            background: #fff;
-            border-radius: 20px;
-            border: 1.5px solid #E2E8F0;
-            overflow: hidden;
+            background: #fff; border-radius: 20px;
+            border: 1.5px solid #E2E8F0; overflow: hidden;
             box-shadow: 0 4px 24px rgba(30,74,118,0.08);
         }
         .pt-table { width: 100%; border-collapse: collapse; }
@@ -194,7 +232,6 @@ def show_patients():
             letter-spacing: 1.2px; text-transform: uppercase;
             color: rgba(255,255,255,0.75); white-space: nowrap; border: none;
         }
-        .pt-table thead th:first-child { border-radius: 0; }
         .pt-table tbody tr { border-bottom: 1px solid #F0F5FA; transition: background 0.12s ease; }
         .pt-table tbody tr:last-child { border-bottom: none; }
         .pt-table tbody tr:hover { background: #F7FAFD; }
@@ -240,6 +277,14 @@ def show_patients():
 
         /* ── EMPTY STATE ── */
         .empty-state { background: #fff; border: 1.5px dashed #CBD5E1; border-radius: 20px; padding: 52px 32px; text-align: center; }
+
+        /* ── ACTIVE TAB BUTTON OVERRIDE ── */
+        .tab-active > div > .stButton > button {
+            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -248,9 +293,8 @@ def show_patients():
         st.session_state.confirm_delete_patient = None
     if '_pt_flash' not in st.session_state:
         st.session_state._pt_flash = None
-    # 0 = Register, 1 = Records, 2 = Edit/Delete
     if '_pt_active_tab' not in st.session_state:
-        st.session_state._pt_active_tab = 0
+        st.session_state._pt_active_tab = "Register"
 
     conn = get_connection()
     total = 0
@@ -282,36 +326,30 @@ def show_patients():
         st.success(st.session_state._pt_flash)
         st.session_state._pt_flash = None
 
-    # Use default_tab to restore the correct tab after a rerun
-    active = st.session_state._pt_active_tab
-    tab1, tab2, tab3 = st.tabs(["Register", "Records", "Edit / Delete"])
+    # ── Custom Tab Bar using st.columns + st.button ───────────────────────────
+    # This replaces st.tabs() so we can control which tab is active via
+    # session_state — st.tabs() always resets to tab 0 on every rerun.
+    TABS = ["Register", "Records", "Edit / Delete"]
+    active_tab = st.session_state._pt_active_tab
 
-    # ── JavaScript to auto-click the correct tab after rerun ─────────────────
-    # Improved tab restoration - now works for all tabs including Register (tab 0)
-    tab_index = active  # 0-based index
-    st.markdown(f"""
-    <script>
-    (function() {{
-        function clickTab() {{
-            var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
-            if (tabs && tabs.length > {tab_index}) {{
-                // Only click if not already active
-                if (!tabs[{tab_index}].getAttribute('aria-selected') || 
-                    tabs[{tab_index}].getAttribute('aria-selected') !== 'true') {{
-                    tabs[{tab_index}].click();
-                }}
-            }} else {{
-                setTimeout(clickTab, 100);
-            }}
-        }}
-        // Try after a short delay to ensure tabs are rendered
-        setTimeout(clickTab, 150);
-    }})();
-    </script>
-    """, unsafe_allow_html=True)
+    # Render the tab bar
+    tab_cols = st.columns(3)
+    for col, tab_name in zip(tab_cols, TABS):
+        with col:
+            # Highlight the active tab with a filled style via CSS trick:
+            # inject a wrapper div with a special class when this tab is active
+            if active_tab == tab_name:
+                st.markdown('<div class="tab-active">', unsafe_allow_html=True)
+            if st.button(tab_name, key=f"_tab_{tab_name}", use_container_width=True):
+                st.session_state._pt_active_tab = tab_name
+                st.rerun()
+            if active_tab == tab_name:
+                st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========== TAB 1 - REGISTER ==========
-    with tab1:
+    st.markdown("<div style='margin-bottom:8px;'></div>", unsafe_allow_html=True)
+
+    # ========== TAB: REGISTER ==========
+    if active_tab == "Register":
         st.markdown('<div class="sec-label">New Patient Details</div>', unsafe_allow_html=True)
         with st.form("register_form"):
             col1, col2 = st.columns(2)
@@ -355,15 +393,15 @@ def show_patients():
                                        new_data={"name": name.strip(), "phone": phone.strip(),
                                                  "email": email.strip(), "gender": gender})
                             st.session_state._pt_flash = f"Patient '{name.strip()}' registered successfully."
-                            st.session_state._pt_active_tab = 0  # stay on Register
+                            st.session_state._pt_active_tab = "Register"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error registering patient: {e}")
                         finally:
                             cur.close(); conn.close()
 
-    # ========== TAB 2 - RECORDS ==========
-    with tab2:
+    # ========== TAB: RECORDS ==========
+    elif active_tab == "Records":
         st.markdown('<div class="sec-label">Search Patients</div>', unsafe_allow_html=True)
         search_term = st.text_input(
             "Search", placeholder="Search by name, phone, email or location...",
@@ -444,8 +482,8 @@ def show_patients():
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ========== TAB 3 - EDIT/DELETE ==========
-    with tab3:
+    # ========== TAB: EDIT / DELETE ==========
+    elif active_tab == "Edit / Delete":
         conn = get_connection()
         if not conn:
             st.error("Database connection failed.")
@@ -531,7 +569,7 @@ def show_patients():
                                        new_data={"name": new_name.strip(), "phone": new_phone.strip(),
                                                  "email": new_email.strip(), "gender": new_gender})
                             st.session_state._pt_flash = f"Patient '{new_name.strip()}' updated successfully."
-                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                            st.session_state._pt_active_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error updating patient: {e}")
@@ -540,7 +578,8 @@ def show_patients():
 
             if delete:
                 st.session_state.confirm_delete_patient = pid
-                st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                st.session_state._pt_active_tab = "Edit / Delete"
+                st.rerun()
 
         if st.session_state.confirm_delete_patient == pid:
             conn = get_connection()
@@ -585,7 +624,7 @@ def show_patients():
                                        error_message=f"Cascade: {appt_count} appointment(s), {pay_count} payment(s) also removed")
                             st.session_state.confirm_delete_patient = None
                             st.session_state._pt_flash = f"Patient '{p[1]}' and all linked records deleted."
-                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                            st.session_state._pt_active_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error deleting patient: {e}")
@@ -594,5 +633,5 @@ def show_patients():
             with dc2:
                 if st.button("Cancel", use_container_width=True, key="cancel_del_pat"):
                     st.session_state.confirm_delete_patient = None
-                    st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                    st.session_state._pt_active_tab = "Edit / Delete"
                     st.rerun()

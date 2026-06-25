@@ -21,18 +21,15 @@ def show_dashboard():
         #MainMenu, footer, header { display: none !important; }
         .block-container { padding: 1.5rem 2rem 2rem !important; max-width: 100% !important; }
 
-        /* ── Nuke ALL ghost borders Streamlit injects ── */
         div[data-testid="stVerticalBlock"] { border: none !important; background: transparent !important; box-shadow: none !important; }
         div[data-testid="column"] > div { border: none !important; background: transparent !important; box-shadow: none !important; }
         div[data-testid="stHorizontalBlock"] { border: none !important; background: transparent !important; }
         .element-container { border: none !important; background: transparent !important; box-shadow: none !important; }
         div[data-testid="stForm"] { border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
         hr { display: none !important; }
-        /* Plotly chart containers */
         div[data-testid="stPlotlyChart"] { border: none !important; background: transparent !important; box-shadow: none !important; }
         iframe { border: none !important; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #E8EDF2; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #E88C30; border-radius: 10px; }
@@ -41,76 +38,56 @@ def show_dashboard():
         /* ── Dashboard Header ── */
         .dash-header {
             background: linear-gradient(135deg, #1E4A76 0%, #2D6A9F 50%, #3A7CA5 100%);
-            border-radius: 24px;
-            padding: 28px 32px;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            border-radius: 24px; padding: 28px 32px; margin-bottom: 28px;
+            display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 8px 24px rgba(30,74,118,0.15);
         }
         .dash-header-left { display: flex; align-items: center; gap: 18px; }
         .dash-header-icon {
-            width: 54px; height: 54px;
-            background: rgba(255,255,255,0.12);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
+            width: 54px; height: 54px; background: rgba(255,255,255,0.12);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.2);
         }
         .dash-title { color: #fff; font-size: 22px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.3px; }
         .dash-sub { color: rgba(255,255,255,0.65); font-size: 13px; margin: 0; }
         .dash-badge {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.85);
-            font-size: 12px; font-weight: 600;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600;
             padding: 8px 18px; border-radius: 40px;
             display: flex; align-items: center; gap: 8px;
         }
         .live-dot {
-            width: 8px; height: 8px;
-            background: #4ADE80; border-radius: 50%;
-            box-shadow: 0 0 8px rgba(74,222,128,0.8);
-            animation: pulse 2s infinite;
+            width: 8px; height: 8px; background: #4ADE80; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(74,222,128,0.8); animation: pulse 2s infinite;
         }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
 
         /* ── Section Heading ── */
         .sec-heading {
-            font-size: 12px; font-weight: 700;
-            color: #6B8FAB; letter-spacing: 1.2px;
-            text-transform: uppercase; margin: 0 0 16px 4px;
+            font-size: 12px; font-weight: 700; color: #6B8FAB;
+            letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 16px 4px;
         }
 
         /* ── KPI Cards ── */
         .kpi-card {
-            background: #FFFFFF; border-radius: 20px;
-            padding: 22px 20px;
-            transition: all 0.25s ease;
-            border: 1px solid #E8EDF2;
+            background: #FFFFFF; border-radius: 20px; padding: 22px 20px;
+            transition: all 0.25s ease; border: 1px solid #E8EDF2;
             position: relative; overflow: hidden;
         }
         .kpi-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(30,74,118,0.12);
-            border-color: #E88C30;
+            box-shadow: 0 12px 28px rgba(30,74,118,0.12); border-color: #E88C30;
         }
         .kpi-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, #E88C30, #F5B87A);
         }
-        .kpi-icon {
-            width: 48px; height: 48px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
-        }
+        .kpi-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
         .kpi-val { font-size: 28px; font-weight: 800; color: #1E4A76; line-height: 1.2; margin-bottom: 6px; }
         .kpi-label { font-size: 12px; color: #6B8FAB; font-weight: 500; }
         .kpi-tag {
             display: inline-flex; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 600;
-            padding: 4px 12px; border-radius: 24px; margin-top: 12px;
+            font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 24px; margin-top: 12px;
         }
         .tag-blue  { background: #EBF3FB; color: #1E4A76; }
         .tag-green { background: #E8F5E9; color: #2E7D32; }
@@ -119,74 +96,26 @@ def show_dashboard():
 
         /* ── Quick Action Cards ── */
         .qa-card {
-            background: #FFFFFF; border-radius: 18px;
-            padding: 20px 12px; text-align: center;
-            border: 1px solid #E8EDF2;
-            transition: all 0.25s ease; cursor: pointer;
+            background: #FFFFFF; border-radius: 18px; padding: 20px 12px; text-align: center;
+            border: 1px solid #E8EDF2; transition: all 0.25s ease; cursor: pointer;
         }
-        .qa-card:hover {
-            transform: translateY(-5px);
-            border-color: #E88C30;
-            box-shadow: 0 8px 20px rgba(232,140,48,0.15);
-        }
-        .qa-icon {
-            width: 54px; height: 54px;
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 14px;
-        }
+        .qa-card:hover { transform: translateY(-5px); border-color: #E88C30; box-shadow: 0 8px 20px rgba(232,140,48,0.15); }
+        .qa-icon { width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
         .qa-label { font-size: 13px; font-weight: 600; color: #1E4A76; margin-bottom: 8px; }
         .qa-arrow { font-size: 11px; color: #E88C30; opacity: 0; transition: opacity 0.2s ease; }
         .qa-card:hover .qa-arrow { opacity: 1; }
 
-        /* ── Chart column wrapper — CSS only, no unclosed HTML divs ── */
-        .chart-col-card {
-            background: #FFFFFF;
-            border-radius: 20px;
-            border: 1px solid #E8EDF2;
-            padding: 20px 16px 8px;
-            margin-bottom: 20px;
-            transition: box-shadow 0.2s ease;
-        }
-        .chart-col-card:hover { box-shadow: 0 6px 16px rgba(30,74,118,0.07); }
-        .chart-col-title {
-            font-size: 14px; font-weight: 700; color: #1E4A76;
-            margin-bottom: 2px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .chart-col-sub { font-size: 11px; color: #8FA8BF; margin-bottom: 6px; }
-
         /* ── Modern Appointments Table ── */
-        .appt-section {
-            background: #FFFFFF; border-radius: 20px;
-            border: 1px solid #E8EDF2; overflow: hidden; margin-bottom: 24px;
-        }
-        .appt-header {
-            padding: 20px 24px 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid #F0F4F8;
-        }
+        .appt-section { background: #FFFFFF; border-radius: 20px; border: 1px solid #E8EDF2; overflow: hidden; margin-bottom: 24px; }
+        .appt-header { padding: 20px 24px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F0F4F8; }
         .appt-header-left { display: flex; align-items: center; gap: 12px; }
-        .appt-header-icon {
-            width: 38px; height: 38px; background: #EBF3FB;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .appt-header-icon { width: 38px; height: 38px; background: #EBF3FB; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .appt-header-title { font-size: 15px; font-weight: 700; color: #1E4A76; margin: 0; }
         .appt-header-sub { font-size: 12px; color: #8FA8BF; margin: 2px 0 0; }
-        .appt-count-badge {
-            background: #EBF3FB; color: #1E4A76;
-            font-size: 12px; font-weight: 700;
-            padding: 4px 14px; border-radius: 20px;
-        }
+        .appt-count-badge { background: #EBF3FB; color: #1E4A76; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px; }
         .appt-table { width: 100%; border-collapse: collapse; }
         .appt-table thead tr { background: #F8FAFE; }
-        .appt-table thead th {
-            padding: 12px 20px; text-align: left;
-            font-size: 11px; font-weight: 700;
-            color: #8FA8BF; letter-spacing: 0.8px;
-            text-transform: uppercase; border-bottom: 1px solid #EEF2F7;
-        }
+        .appt-table thead th { padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8FA8BF; letter-spacing: 0.8px; text-transform: uppercase; border-bottom: 1px solid #EEF2F7; }
         .appt-table tbody tr { border-bottom: 1px solid #F4F7FA; transition: background 0.15s ease; }
         .appt-table tbody tr:last-child { border-bottom: none; }
         .appt-table tbody tr:hover { background: #F8FAFE; }
@@ -195,23 +124,10 @@ def show_dashboard():
         .appt-date { font-size: 13px; font-weight: 600; color: #1E4A76; }
         .appt-time { font-size: 11px; color: #8FA8BF; }
         .appt-patient { display: flex; align-items: center; gap: 10px; }
-        .appt-avatar {
-            width: 34px; height: 34px; border-radius: 10px;
-            background: linear-gradient(135deg, #1E4A76, #3A7CA5);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
-        }
+        .appt-avatar { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #1E4A76, #3A7CA5); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
         .appt-patient-name { font-size: 13px; font-weight: 600; color: #1A3A5C; }
-        .appt-treatment {
-            font-size: 12px; color: #1E4A76; font-weight: 600;
-            background: #EBF3FB;
-            display: inline-block; padding: 4px 12px; border-radius: 8px;
-        }
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 14px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
-        }
+        .appt-treatment { font-size: 12px; color: #1E4A76; font-weight: 600; background: #EBF3FB; display: inline-block; padding: 4px 12px; border-radius: 8px; }
+        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; }
         .s-completed { background: #E8F5E9; color: #2E7D32; }
         .s-completed .status-dot { background: #2E7D32; }
@@ -221,34 +137,32 @@ def show_dashboard():
         .s-noshow .status-dot { background: #D32F2F; }
         .s-cancelled { background: #F5F5F5; color: #6B8FAB; }
         .s-cancelled .status-dot { background: #9E9E9E; }
-        .appt-empty {
-            text-align: center; padding: 48px 24px;
-            color: #8FA8BF; font-size: 14px;
-        }
+        .appt-empty { text-align: center; padding: 48px 24px; color: #8FA8BF; font-size: 14px; }
     </style>
     """, unsafe_allow_html=True)
 
-    # ── Header ───────────────────────────────────────────────────────────────
-    hour = datetime.now().hour
-    greeting = "Good morning" if hour < 12 else "Good afternoon" if hour < 17 else "Good evening"
-    today_str = datetime.now().strftime("%A, %B %d, %Y")
+    # ── Greeting — time-based using server clock, name from session ───────────
+    now      = datetime.now()
+    hour     = now.hour
+    minute   = now.minute
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 17:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
 
-    st.markdown(f"""
-    <div class="dash-header">
-        <div class="dash-header-left">
-            <div class="dash-header-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
-                    <path d="M4 4h6v8H4V4zm10 0h6v4h-6V4zm0 8h6v8h-6v-8zM4 16h6v4H4v-4z"/>
-                </svg>
-            </div>
-            <div>
-                <p class="dash-title">{greeting}, Staff</p>
-                <p class="dash-sub">Shallom Dental Clinic &middot; {today_str}</p>
-            </div>
-        </div>
-        <div class="dash-badge"><div class="live-dot"></div>Live Dashboard</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Use logged-in username from session state if available
+    username = st.session_state.get("username", None)
+    if username:
+        # Capitalise first letter, strip trailing whitespace
+        display_name = username.strip().capitalize()
+    else:
+        display_name = "Staff"
+
+    # Live clock string e.g. "Wednesday, June 25, 2026  •  09:42 AM"
+    time_str  = now.strftime("%I:%M %p").lstrip("0")   # e.g. "9:42 AM"
+    today_str = now.strftime("%A, %B %d, %Y")
 
     # ── Fetch Data ────────────────────────────────────────────────────────────
     conn = get_connection()
@@ -290,7 +204,7 @@ def show_dashboard():
     """)
     monthly_appt_rows = cursor.fetchall()
 
-    # Revenue: raw amounts (not divided) — chart y-axis shows actual UGX values
+    # Revenue: raw UGX amounts — no division
     cursor.execute("""
         SELECT label, revenue FROM (
             SELECT TO_CHAR(payment_date, 'Mon') AS label,
@@ -311,6 +225,24 @@ def show_dashboard():
 
     cursor.close()
     conn.close()
+
+    # ── Header ────────────────────────────────────────────────────────────────
+    st.markdown(f"""
+    <div class="dash-header">
+        <div class="dash-header-left">
+            <div class="dash-header-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+                    <path d="M4 4h6v8H4V4zm10 0h6v4h-6V4zm0 8h6v8h-6v-8zM4 16h6v4H4v-4z"/>
+                </svg>
+            </div>
+            <div>
+                <p class="dash-title">{greeting}, {esc(display_name)} &nbsp;<span style="font-size:18px;">👋</span></p>
+                <p class="dash-sub">Shallom Dental Clinic &middot; {today_str} &middot; {time_str}</p>
+            </div>
+        </div>
+        <div class="dash-badge"><div class="live-dot"></div>Live Dashboard</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ── KPI Row 1 ─────────────────────────────────────────────────────────────
     st.markdown('<div class="sec-heading">KEY METRICS</div>', unsafe_allow_html=True)
@@ -463,10 +395,8 @@ def show_dashboard():
         .stButton > button {{
             background:transparent!important; border:none!important;
             box-shadow:none!important; color:transparent!important;
-            height:{QA_CARD_H}px!important;
-            box-sizing:border-box!important;
-            width:100%!important;
-            padding:0!important; cursor:pointer!important;
+            height:{QA_CARD_H}px!important; box-sizing:border-box!important;
+            width:100%!important; padding:0!important; cursor:pointer!important;
             opacity:0!important;
         }}
         .stButton > button:hover {{ background:transparent!important; }}
@@ -492,10 +422,8 @@ def show_dashboard():
     st.markdown('<div class="sec-heading" style="margin-top:28px;">PERFORMANCE TRENDS</div>', unsafe_allow_html=True)
     months    = [row[0] for row in monthly_appt_rows]
     appt_vals = [int(row[1]) for row in monthly_appt_rows]
-
-    # Revenue: raw UGX values — no division, no "millions" scaling
     rev_months = [row[0] for row in monthly_rev_rows]
-    rev_vals   = [float(row[1]) for row in monthly_rev_rows]
+    rev_vals   = [float(row[1]) for row in monthly_rev_rows]   # raw UGX — no division
 
     CARD_BG = '#FFFFFF'
     BORDER  = '#E8EDF2'
@@ -507,23 +435,19 @@ def show_dashboard():
     def card_layout(height=300, title="", t_margin=52):
         return dict(
             plot_bgcolor=CARD_BG, paper_bgcolor=CARD_BG,
-            height=height,
-            margin=dict(l=16, r=16, t=t_margin, b=16),
+            height=height, margin=dict(l=16, r=16, t=t_margin, b=16),
             showlegend=False,
             font=dict(family='Inter, sans-serif', color=MUTED),
-            title=dict(text=title, font=dict(size=14, color=BLUE, family='Inter, sans-serif'), x=0.01, y=0.97, xanchor='left', yanchor='top'),
+            title=dict(text=title, font=dict(size=14, color=BLUE, family='Inter, sans-serif'),
+                       x=0.01, y=0.97, xanchor='left', yanchor='top'),
             shapes=[
-                dict(type='rect', xref='paper', yref='paper',
-                     x0=0, y0=0, x1=1, y1=1,
-                     line=dict(color=BORDER, width=1),
-                     fillcolor=CARD_BG, layer='below'),
-                dict(type='line', xref='paper', yref='paper',
-                     x0=0, y0=1, x1=1, y1=1,
+                dict(type='rect', xref='paper', yref='paper', x0=0, y0=0, x1=1, y1=1,
+                     line=dict(color=BORDER, width=1), fillcolor=CARD_BG, layer='below'),
+                dict(type='line', xref='paper', yref='paper', x0=0, y0=1, x1=1, y1=1,
                      line=dict(color=AMBER, width=3)),
             ]
         )
 
-    # Helper: format UGX amounts smartly for bar chart labels
     def fmt_ugx(v):
         if v >= 1_000_000:
             return f"{v/1_000_000:.1f}M"
@@ -537,8 +461,7 @@ def show_dashboard():
         if months:
             fig = go.Figure()
             fig.add_trace(go.Scatter(
-                x=months, y=appt_vals,
-                mode='lines+markers',
+                x=months, y=appt_vals, mode='lines+markers',
                 line=dict(color=BLUE, width=3),
                 marker=dict(color=AMBER, size=9),
                 fill='tozeroy', fillcolor='rgba(30,74,118,0.05)'
@@ -555,16 +478,14 @@ def show_dashboard():
             fig = go.Figure(go.Bar(
                 x=rev_months, y=rev_vals,
                 marker=dict(color=AMBER, opacity=0.9, line=dict(color=BLUE, width=1)),
-                # Show compact labels (e.g. 1.2M or 450K) above each bar
                 text=[fmt_ugx(v) for v in rev_vals],
                 textposition='outside',
                 textfont=dict(color=BLUE, size=11)
             ))
-            # Title no longer says "Millions" — shows actual UGX on y-axis
             fig.update_layout(**card_layout(title="💰  Revenue Trend (UGX)", t_margin=60))
             fig.update_xaxes(showgrid=False, color=MUTED, linecolor=BORDER)
             fig.update_yaxes(showgrid=True, gridcolor=GRID, color=MUTED, linecolor=BORDER,
-                             tickformat=",")   # comma-separated thousands on y-axis
+                             tickformat=",")
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
         else:
             st.info("No payment data yet to chart.")
@@ -574,7 +495,7 @@ def show_dashboard():
     cc1, cc2 = st.columns(2)
 
     with cc1:
-        status_df    = pd.DataFrame(status_data, columns=['Status', 'Count'])
+        status_df     = pd.DataFrame(status_data, columns=['Status', 'Count'])
         status_colors = {'Completed': '#2E7D32', 'Scheduled': BLUE, 'No-show': '#D32F2F', 'Cancelled': MUTED}
         fig = go.Figure(data=[go.Pie(
             labels=status_df['Status'], values=status_df['Count'],
@@ -605,7 +526,7 @@ def show_dashboard():
         else:
             st.info("No treatment data yet to chart.")
 
-    # ── Recent Appointments — Modern Card Table ───────────────────────────────
+    # ── Recent Appointments ───────────────────────────────────────────────────
     st.markdown('<div class="sec-heading">RECENT APPOINTMENTS</div>', unsafe_allow_html=True)
 
     conn   = get_connection()
@@ -615,9 +536,9 @@ def show_dashboard():
         cursor.execute("""
             SELECT TO_CHAR(a.appointment_date, 'Mon DD, YYYY') AS date,
                    TO_CHAR(a.appointment_time, 'HH12:MI AM')   AS time,
-                   p.name       AS patient,
-                   a.treatment  AS treatment,
-                   a.status     AS status
+                   p.name      AS patient,
+                   a.treatment AS treatment,
+                   a.status    AS status
             FROM appointments a
             JOIN patients p ON a.patient_id = p.patient_id
             ORDER BY a.appointment_date DESC, a.appointment_time DESC
@@ -642,24 +563,10 @@ def show_dashboard():
             pill_cls  = status_cls.get(status, 's-scheduled')
             rows_html += f"""
             <tr>
-                <td>
-                    <div class="appt-date-col">
-                        <span class="appt-date">{date}</span>
-                        <span class="appt-time">{time_val}</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="appt-patient">
-                        <div class="appt-avatar">{initials}</div>
-                        <span class="appt-patient-name">{patient}</span>
-                    </div>
-                </td>
+                <td><div class="appt-date-col"><span class="appt-date">{date}</span><span class="appt-time">{time_val}</span></div></td>
+                <td><div class="appt-patient"><div class="appt-avatar">{initials}</div><span class="appt-patient-name">{patient}</span></div></td>
                 <td><span class="appt-treatment">{treatment}</span></td>
-                <td>
-                    <span class="status-pill {pill_cls}">
-                        <span class="status-dot"></span>{status}
-                    </span>
-                </td>
+                <td><span class="status-pill {pill_cls}"><span class="status-dot"></span>{status}</span></td>
             </tr>"""
 
         st.markdown(f"""
@@ -682,14 +589,7 @@ def show_dashboard():
                 <span class="appt-count-badge">{len(recent)} records</span>
             </div>
             <table class="appt-table">
-                <thead>
-                    <tr>
-                        <th>Date &amp; Time</th>
-                        <th>Patient</th>
-                        <th>Treatment</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Date &amp; Time</th><th>Patient</th><th>Treatment</th><th>Status</th></tr></thead>
                 <tbody>{rows_html}</tbody>
             </table>
         </div>""", unsafe_allow_html=True)
