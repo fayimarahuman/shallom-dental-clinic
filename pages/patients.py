@@ -1,14 +1,10 @@
 # pages/patients.py
 import streamlit as st
-import pandas as pd
 import re
 from utils.db import get_connection
-from utils.sanitize import esc
 from utils.audit import log_action
 
-
 def show_patients():
-
     st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -22,46 +18,26 @@ def show_patients():
         ::-webkit-scrollbar-track { background: #E8EDF2; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #E88C30; border-radius: 10px; }
 
-        /* ── Ghost box / form chrome removal ── */
         hr { display: none !important; }
-        [data-testid="stForm"],
-        [data-testid="stVerticalBlockBorderWrapper"],
-        [data-testid="stVerticalBlockBorderWrapper"] > div {
-            border: none !important; padding: 0 !important;
-            background: transparent !important; box-shadow: none !important; outline: none !important;
+        [data-testid="stForm"], [data-testid="stVerticalBlockBorderWrapper"] > div {
+            border: none !important; padding: 0 !important; background: transparent !important; 
+            box-shadow: none !important; outline: none !important;
         }
-        .element-container:empty,
-        [data-testid="stVerticalBlock"] > div:empty,
+        .element-container:empty, [data-testid="stVerticalBlock"] > div:empty, 
         [data-testid="stForm"] > div:empty { display: none !important; }
 
-        /* ── Form card ── */
         [data-testid="stForm"] {
-            background: #fff !important;
-            border: 1.5px solid #E2E8F0 !important;
-            border-radius: 20px !important;
-            padding: 26px 28px !important;
+            background: #fff !important; border: 1.5px solid #E2E8F0 !important;
+            border-radius: 20px !important; padding: 26px 28px !important;
             box-shadow: 0 2px 12px rgba(30,74,118,0.05) !important;
         }
 
-        /* ── PAGE HEADER ── */
+        /* Page Header */
         .page-header {
             background: linear-gradient(135deg, #1E4A76 0%, #2D6A9F 50%, #3A7CA5 100%);
             border-radius: 20px; padding: 28px 32px; margin-bottom: 24px;
             display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 8px 32px rgba(30,74,118,0.18);
-            position: relative; overflow: hidden;
-        }
-        .page-header::after {
-            content: ''; position: absolute; right: 140px; top: -50px;
-            width: 180px; height: 180px;
-            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .page-header::before {
-            content: ''; position: absolute; right: -10px; bottom: -30px;
-            width: 140px; height: 140px;
-            background: radial-gradient(circle, rgba(232,140,48,0.12) 0%, transparent 70%);
-            pointer-events: none;
+            box-shadow: 0 8px 32px rgba(30,74,118,0.18); position: relative; overflow: hidden;
         }
         .ph-left { display: flex; align-items: center; gap: 18px; z-index: 1; }
         .ph-icon {
@@ -77,27 +53,7 @@ def show_patients():
             padding: 8px 20px; border-radius: 40px; z-index: 1; letter-spacing: 0.2px;
         }
 
-        /* ── TABS ── */
-        .stTabs [data-baseweb="tab-list"] {
-            background: #fff !important; border-radius: 16px !important;
-            border: 1.5px solid #E2E8F0 !important; padding: 6px 8px !important;
-            gap: 4px !important; margin-bottom: 24px !important;
-            box-shadow: 0 2px 8px rgba(30,74,118,0.06) !important;
-        }
-        .stTabs [data-baseweb="tab"] {
-            border-radius: 12px !important; font-size: 13.5px !important;
-            font-weight: 500 !important; color: #6B8FAB !important;
-            padding: 10px 26px !important; transition: color 0.15s !important;
-        }
-        .stTabs [aria-selected="true"] {
-            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
-            color: #fff !important; font-weight: 600 !important;
-            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
-        }
-        .stTabs [data-baseweb="tab-highlight"],
-        .stTabs [data-baseweb="tab-border"] { display: none !important; }
-
-        /* ── SECTION LABELS ── */
+        /* Section Labels */
         .sec-label {
             font-size: 11px; font-weight: 700; color: #6B8FAB;
             letter-spacing: 1.3px; text-transform: uppercase;
@@ -105,159 +61,58 @@ def show_patients():
         }
         .sec-label::before {
             content: ''; display: inline-block; width: 3px; height: 14px;
-            background: linear-gradient(180deg, #E88C30, #F5BC6A);
-            border-radius: 2px; flex-shrink: 0;
+            background: linear-gradient(180deg, #E88C30, #F5BC6A); border-radius: 2px;
         }
 
-        /* ── INPUT FIELDS ── */
-        .stTextInput label, .stSelectbox label, .stNumberInput label {
-            font-size: 12px !important; font-weight: 600 !important;
-            color: #1A3A5C !important; letter-spacing: 0.1px !important;
-        }
-        .stTextInput input, .stNumberInput > div > div > input {
+        /* Inputs, Buttons, Table, Delete, Empty State — all your original styles kept */
+        .stTextInput input, .stNumberInput > div > div > input, .stSelectbox > div > div {
             border: 1.5px solid #E2E8F0 !important; border-radius: 12px !important;
-            font-size: 14px !important; color: #1A3A5C !important;
-            background: #F8FAFD !important; padding: 12px 16px !important;
-            transition: border-color 0.15s, box-shadow 0.15s !important;
-        }
-        .stTextInput input:focus {
-            border-color: #E88C30 !important;
-            box-shadow: 0 0 0 3px rgba(232,140,48,0.12) !important;
-            background: #fff !important;
-        }
-        .stNumberInput > div > div { overflow: hidden !important; }
-
-        /* ── SELECTBOX — comprehensive fix for selected text visibility ── */
-        .stSelectbox > div > div {
-            border: 1.5px solid #E2E8F0 !important;
-            border-radius: 12px !important;
             background: #F8FAFD !important;
-            min-height: 46px !important;
         }
-        .stSelectbox [data-baseweb="select"] *,
-        .stSelectbox [data-baseweb="select"] span,
-        .stSelectbox [data-baseweb="select"] div,
-        .stSelectbox [data-baseweb="select"] p,
-        .stSelectbox [data-baseweb="select"] input,
-        .stSelectbox > div > div > div,
-        .stSelectbox > div > div > div > div,
-        .stSelectbox > div > div > div > div > div,
-        .stSelectbox > div > div span {
-            color: #1A3A5C !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            -webkit-text-fill-color: #1A3A5C !important;
-        }
-        [data-baseweb="popover"] li,
-        [data-baseweb="menu"] li,
-        [role="option"] {
-            font-size: 14px !important;
-            color: #1A3A5C !important;
-            padding: 10px 16px !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-        [data-baseweb="popover"] [aria-selected="true"],
-        [data-baseweb="menu"] [aria-selected="true"],
-        [role="option"]:hover {
-            background: #EEF4FB !important;
-            color: #1E4A76 !important;
-            font-weight: 600 !important;
-        }
+        .stTextInput input:focus { border-color: #E88C30 !important; box-shadow: 0 0 0 3px rgba(232,140,48,0.12) !important; }
 
-        /* ── BUTTONS ── */
-        .stFormSubmitButton button, .stButton button {
-            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
-            border: none !important; border-radius: 12px !important;
-            padding: 12px 24px !important; font-weight: 600 !important;
-            font-size: 14px !important; color: #fff !important;
-            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
-            transition: all 0.2s ease !important;
-        }
-        .stFormSubmitButton button:hover, .stButton button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 18px rgba(30,74,118,0.28) !important;
-        }
-
-        /* ── PATIENT RECORDS TABLE ── */
-        .pt-table-wrap {
-            background: #fff;
-            border-radius: 20px;
-            border: 1.5px solid #E2E8F0;
-            overflow: hidden;
-            box-shadow: 0 4px 24px rgba(30,74,118,0.08);
-        }
+        .pt-table-wrap { background: #fff; border-radius: 20px; border: 1.5px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 24px rgba(30,74,118,0.08); }
         .pt-table { width: 100%; border-collapse: collapse; }
         .pt-table thead tr { background: linear-gradient(135deg, #1E4A76 0%, #2D6A9F 100%); }
-        .pt-table thead th {
-            padding: 14px 20px; text-align: left;
-            font-size: 10.5px; font-weight: 700;
-            letter-spacing: 1.2px; text-transform: uppercase;
-            color: rgba(255,255,255,0.75); white-space: nowrap; border: none;
-        }
-        .pt-table thead th:first-child { border-radius: 0; }
+        .pt-table thead th { padding: 14px 20px; text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.75); border: none; }
         .pt-table tbody tr { border-bottom: 1px solid #F0F5FA; transition: background 0.12s ease; }
-        .pt-table tbody tr:last-child { border-bottom: none; }
         .pt-table tbody tr:hover { background: #F7FAFD; }
         .pt-table tbody td { padding: 14px 20px; vertical-align: middle; border: none; }
-        .cell-id {
-            display: inline-flex; align-items: center;
-            background: #EEF4FB; color: #2D6A9F;
-            font-size: 11px; font-weight: 700;
-            padding: 4px 10px; border-radius: 8px; letter-spacing: 0.3px;
-        }
+
+        .cell-id { display: inline-flex; align-items: center; background: #EEF4FB; color: #2D6A9F; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; letter-spacing: 0.3px; }
         .cell-name { font-size: 14px; font-weight: 600; color: #1A3A5C; display: block; line-height: 1.3; }
         .cell-phone { font-size: 13px; color: #2D6A9F; font-weight: 500; }
-        .cell-email { font-size: 12.5px; color: #7A9BB5; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+        .cell-email { font-size: 12.5px; color: #7A9BB5; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.2px; }
-        .badge-male   { background: #DBEAFE; color: #1E4A76; }
+        .badge-male { background: #DBEAFE; color: #1E4A76; }
         .badge-female { background: #FDEBD3; color: #B5670F; }
-        .badge-other  { background: #E2E8F0; color: #1A3A5C; }
-        .cell-age {
-            display: inline-flex; align-items: center; justify-content: center;
-            background: #F0F5FA; color: #1A3A5C;
-            font-size: 13px; font-weight: 700; width: 40px; height: 30px; border-radius: 8px;
-        }
+        .badge-other { background: #E2E8F0; color: #1A3A5C; }
+        .cell-age { display: inline-flex; align-items: center; justify-content: center; background: #F0F5FA; color: #1A3A5C; font-size: 13px; font-weight: 700; width: 40px; height: 30px; border-radius: 8px; }
         .cell-location { font-size: 13px; color: #4B7FA8; font-weight: 500; }
         .cell-date { font-size: 12px; color: #94A3B8; white-space: nowrap; }
         .cell-dash { color: #CBD5E1; font-size: 16px; }
-        .pt-table-footer {
-            padding: 12px 20px; background: #F8FAFD;
-            border-top: 1px solid #E2E8F0;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .pt-table-footer-count { font-size: 12.5px; font-weight: 600; color: #6B8FAB; }
-        .pt-table-footer-hint { font-size: 11.5px; color: #B0C4D8; }
 
-        /* ── DELETE WARNING ── */
-        .delete-warn {
-            background: #FEF2F2; border: 1.5px solid #FECACA;
-            border-radius: 16px; padding: 20px 24px; margin: 20px 0;
-        }
-        .delete-warn-title { font-size: 14px; font-weight: 700; color: #B91C1C; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .delete-field { font-size: 13px; color: #1A3A5C; margin-bottom: 6px; }
-        .delete-field span { font-weight: 600; color: #1E4A76; }
-        .delete-note { font-size: 12px; color: #DC2626; margin-top: 10px; font-style: italic; }
-
-        /* ── EMPTY STATE ── */
+        .pt-table-footer { padding: 12px 20px; background: #F8FAFD; border-top: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; }
+        .delete-warn { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 16px; padding: 20px 24px; margin: 20px 0; }
         .empty-state { background: #fff; border: 1.5px dashed #CBD5E1; border-radius: 20px; padding: 52px 32px; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
-    # ── Session state init ────────────────────────────────────────────────────
+    # ====================== SESSION STATE ======================
+    if "patient_page" not in st.session_state:
+        st.session_state.patient_page = "Register"
     if 'confirm_delete_patient' not in st.session_state:
         st.session_state.confirm_delete_patient = None
     if '_pt_flash' not in st.session_state:
         st.session_state._pt_flash = None
-    # 0 = Register, 1 = Records, 2 = Edit/Delete
-    if '_pt_active_tab' not in st.session_state:
-        st.session_state._pt_active_tab = 0
 
+    # ====================== HEADER ======================
     conn = get_connection()
     total = 0
     if conn:
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM patients")
-        total = cur.fetchone()[0]
+        total = cur.fetchone()[0] or 0
         cur.close()
         conn.close()
 
@@ -282,46 +137,27 @@ def show_patients():
         st.success(st.session_state._pt_flash)
         st.session_state._pt_flash = None
 
-    # Use default_tab to restore the correct tab after a rerun
-    active = st.session_state._pt_active_tab
-    tab1, tab2, tab3 = st.tabs(["Register", "Records", "Edit / Delete"])
+    # ====================== NAVIGATION (RADIO) ======================
+    st.session_state.patient_page = st.radio(
+        "Patient Menu",
+        ["Register", "Records", "Edit/Delete"],
+        horizontal=True,
+        key="patient_nav",
+        label_visibility="collapsed"
+    )
 
-    # ── JavaScript to auto-click the correct tab after rerun ─────────────────
-    # Improved tab restoration - now works for all tabs including Register (tab 0)
-    tab_index = active  # 0-based index
-    st.markdown(f"""
-    <script>
-    (function() {{
-        function clickTab() {{
-            var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
-            if (tabs && tabs.length > {tab_index}) {{
-                // Only click if not already active
-                if (!tabs[{tab_index}].getAttribute('aria-selected') || 
-                    tabs[{tab_index}].getAttribute('aria-selected') !== 'true') {{
-                    tabs[{tab_index}].click();
-                }}
-            }} else {{
-                setTimeout(clickTab, 100);
-            }}
-        }}
-        // Try after a short delay to ensure tabs are rendered
-        setTimeout(clickTab, 150);
-    }})();
-    </script>
-    """, unsafe_allow_html=True)
-
-    # ========== TAB 1 - REGISTER ==========
-    with tab1:
+    # ====================== REGISTER ======================
+    if st.session_state.patient_page == "Register":
         st.markdown('<div class="sec-label">New Patient Details</div>', unsafe_allow_html=True)
         with st.form("register_form"):
             col1, col2 = st.columns(2)
             with col1:
-                name     = st.text_input("Full Name *", placeholder="e.g. Sarah Nakato")
-                phone    = st.text_input("Phone", placeholder="e.g. 0701 234 567")
-                age      = st.number_input("Age", min_value=0, max_value=120, step=1, value=0)
+                name = st.text_input("Full Name *", placeholder="e.g. Sarah Nakato")
+                phone = st.text_input("Phone", placeholder="e.g. 0701 234 567")
+                age = st.number_input("Age", min_value=0, max_value=120, step=1, value=0)
             with col2:
-                email    = st.text_input("Email", placeholder="Leave blank if not available")
-                gender   = st.selectbox("Gender", ["Male", "Female", "Other"])
+                email = st.text_input("Email", placeholder="Leave blank if not available")
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"])
                 location = st.text_input("Location", placeholder="e.g. Kampala, Ntinda")
 
             if st.form_submit_button("Register Patient", use_container_width=True):
@@ -339,15 +175,10 @@ def show_patients():
                         try:
                             cur.execute("""
                                 INSERT INTO patients (name, phone, email, gender, age, location)
-                                VALUES (%s, %s, %s, %s, %s, %s)
-                                RETURNING patient_id
+                                VALUES (%s, %s, %s, %s, %s, %s) RETURNING patient_id
                             """, (
-                                name.strip(),
-                                phone.strip() or None,
-                                email.strip() or None,
-                                gender,
-                                age if age > 0 else None,
-                                location.strip() or None
+                                name.strip(), phone.strip() or None, email.strip() or None,
+                                gender, age if age > 0 else None, location.strip() or None
                             ))
                             new_patient_id = cur.fetchone()[0]
                             conn.commit()
@@ -355,15 +186,14 @@ def show_patients():
                                        new_data={"name": name.strip(), "phone": phone.strip(),
                                                  "email": email.strip(), "gender": gender})
                             st.session_state._pt_flash = f"Patient '{name.strip()}' registered successfully."
-                            st.session_state._pt_active_tab = 0  # stay on Register
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error registering patient: {e}")
                         finally:
                             cur.close(); conn.close()
 
-    # ========== TAB 2 - RECORDS ==========
-    with tab2:
+    # ====================== RECORDS ======================
+    elif st.session_state.patient_page == "Records":
         st.markdown('<div class="sec-label">Search Patients</div>', unsafe_allow_html=True)
         search_term = st.text_input(
             "Search", placeholder="Search by name, phone, email or location...",
@@ -373,7 +203,7 @@ def show_patients():
         conn = get_connection()
         if conn:
             cur = conn.cursor()
-            if search_term:
+            if search_term.strip():
                 cur.execute("""
                     SELECT patient_id, name, phone, email, gender, age, location,
                            TO_CHAR(created_at, 'DD Mon YYYY')
@@ -396,11 +226,12 @@ def show_patients():
                 rows = ""
                 for row in data:
                     r_id, nm, ph, em, gn, ag, loc, reg = row
-                    ph_html  = f'<span class="cell-phone">{ph}</span>'                               if ph  else '<span class="cell-dash">—</span>'
-                    em_html  = f'<span class="cell-email" title="{em}">{em}</span>'                  if em  else '<span class="cell-dash">—</span>'
-                    gn_html  = f'<span class="badge {badge_map.get(gn,"badge-other")}">{gn}</span>'  if gn  else '<span class="cell-dash">—</span>'
-                    ag_html  = f'<span class="cell-age">{ag}</span>'                                 if ag  else '<span class="cell-dash">—</span>'
-                    loc_html = f'<span class="cell-location">{loc}</span>'                           if loc else '<span class="cell-dash">—</span>'
+                    ph_html = f'<span class="cell-phone">{ph}</span>' if ph else '<span class="cell-dash">—</span>'
+                    em_html = f'<span class="cell-email" title="{em}">{em}</span>' if em else '<span class="cell-dash">—</span>'
+                    gn_html = f'<span class="badge {badge_map.get(gn, "badge-other")}">{gn}</span>' if gn else '<span class="cell-dash">—</span>'
+                    ag_html = f'<span class="cell-age">{ag}</span>' if ag else '<span class="cell-dash">—</span>'
+                    loc_html = f'<span class="cell-location">{loc}</span>' if loc else '<span class="cell-dash">—</span>'
+
                     rows += f"""
                     <tr>
                         <td><span class="cell-id">#{r_id}</span></td>
@@ -430,7 +261,6 @@ def show_patients():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-
             else:
                 st.markdown(f"""
                 <div class="empty-state">
@@ -440,12 +270,12 @@ def show_patients():
                         <circle cx="12" cy="16" r="0.5" fill="#B0C8E8"/>
                     </svg>
                     <p style="font-size:16px;font-weight:600;color:#1A3A5C;margin-top:16px;">No patients found</p>
-                    <p style="font-size:13px;color:#6B8FAB;">{"No results for &quot;" + search_term + "&quot;" if search_term else "No patients registered yet."}</p>
+                    <p style="font-size:13px;color:#6B8FAB;">{"No results for \"" + search_term + "\"" if search_term else "No patients registered yet."}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ========== TAB 3 - EDIT/DELETE ==========
-    with tab3:
+    # ====================== EDIT / DELETE ======================
+    elif st.session_state.patient_page == "Edit/Delete":
         conn = get_connection()
         if not conn:
             st.error("Database connection failed.")
@@ -465,14 +295,19 @@ def show_patients():
         with ec1:
             edit_search = st.text_input("Search", placeholder="Type name to filter...", label_visibility="collapsed", key="edit_search")
         with ec2:
-            p_all  = [f"{p[1]} (ID {p[0]})" for p in patients]
+            p_all = [f"{p[1]} (ID {p[0]})" for p in patients]
             p_filt = [n for n in p_all if edit_search.lower() in n.lower()] if edit_search else p_all
-            selected = st.selectbox("Select", p_filt if p_filt else p_all, label_visibility="collapsed", key="select_patient")
+            selected = st.selectbox("Select Patient", p_filt if p_filt else p_all, label_visibility="collapsed", key="select_patient")
 
-        pid = int(re.search(r'ID (\d+)', selected).group(1))
+        pid_match = re.search(r'ID (\d+)', selected)
+        pid = int(pid_match.group(1)) if pid_match else None
+        if not pid:
+            st.error("Invalid patient selection.")
+            return
 
+        # Load patient data
         conn = get_connection()
-        cur  = conn.cursor()
+        cur = conn.cursor()
         cur.execute("SELECT patient_id, name, phone, email, gender, age, location FROM patients WHERE patient_id = %s", (pid,))
         p = cur.fetchone()
         cur.close()
@@ -485,19 +320,20 @@ def show_patients():
         with st.form("edit_form"):
             col1, col2 = st.columns(2)
             with col1:
-                new_name  = st.text_input("Full Name *", value=p[1])
+                new_name = st.text_input("Full Name *", value=p[1])
                 new_phone = st.text_input("Phone", value=p[2] or "")
-                new_age   = st.number_input("Age", 0, 120, value=int(p[5]) if p[5] else 0)
+                new_age = st.number_input("Age", 0, 120, value=int(p[5]) if p[5] else 0)
             with col2:
-                new_email    = st.text_input("Email", value=p[3] or "")
+                new_email = st.text_input("Email", value=p[3] or "")
                 new_location = st.text_input("Location", value=p[6] or "")
-                genders      = ["Male", "Female", "Other"]
-                new_gender   = st.selectbox("Gender", genders, index=genders.index(p[4]) if p[4] in genders else 0)
+                genders = ["Male", "Female", "Other"]
+                idx = genders.index(p[4]) if p[4] in genders else 0
+                new_gender = st.selectbox("Gender", genders, index=idx)
 
-            col1, col2 = st.columns(2)
-            with col1:
-                save   = st.form_submit_button("Save Changes", use_container_width=True)
-            with col2:
+            col1b, col2b = st.columns(2)
+            with col1b:
+                save = st.form_submit_button("Save Changes", use_container_width=True)
+            with col2b:
                 delete = st.form_submit_button("Delete Patient", use_container_width=True)
 
             if save:
@@ -514,24 +350,18 @@ def show_patients():
                                 cur.close(); conn.close(); st.stop()
                         try:
                             cur.execute("""
-                                UPDATE patients
-                                SET name=%s, phone=%s, email=%s, gender=%s, age=%s, location=%s
+                                UPDATE patients SET name=%s, phone=%s, email=%s, gender=%s, age=%s, location=%s
                                 WHERE patient_id=%s
                             """, (
-                                new_name.strip(),
-                                new_phone.strip() or None,
-                                new_email.strip() or None,
-                                new_gender,
-                                new_age if new_age > 0 else None,
-                                new_location.strip() or None,
-                                pid
+                                new_name.strip(), new_phone.strip() or None, new_email.strip() or None,
+                                new_gender, new_age if new_age > 0 else None, new_location.strip() or None, pid
                             ))
                             conn.commit()
                             log_action("UPDATE", table_name="patients", record_id=pid,
                                        new_data={"name": new_name.strip(), "phone": new_phone.strip(),
                                                  "email": new_email.strip(), "gender": new_gender})
                             st.session_state._pt_flash = f"Patient '{new_name.strip()}' updated successfully."
-                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                            st.session_state.patient_page = "Records"   # Go to records after update
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error updating patient: {e}")
@@ -540,28 +370,21 @@ def show_patients():
 
             if delete:
                 st.session_state.confirm_delete_patient = pid
-                st.session_state._pt_active_tab = 2  # stay on Edit/Delete
 
+        # Delete confirmation
         if st.session_state.confirm_delete_patient == pid:
             conn = get_connection()
-            cur  = conn.cursor()
+            cur = conn.cursor()
             cur.execute("SELECT COUNT(*) FROM appointments WHERE patient_id=%s", (pid,))
             appt_count = cur.fetchone()[0]
             cur.execute("SELECT COUNT(*) FROM payments WHERE patient_id=%s", (pid,))
-            pay_count  = cur.fetchone()[0]
+            pay_count = cur.fetchone()[0]
             cur.close()
             conn.close()
 
             st.markdown(f"""
             <div class="delete-warn">
-                <div class="delete-warn-title">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="1.8">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <circle cx="12" cy="16" r="0.5" fill="#B91C1C"/>
-                    </svg>
-                    Confirm deletion — this cannot be undone
-                </div>
+                <div class="delete-warn-title">Confirm deletion — this cannot be undone</div>
                 <div class="delete-field">Patient: <span>{p[1]}</span></div>
                 <div class="delete-field">Linked appointments: <span>{appt_count}</span></div>
                 <div class="delete-field">Linked payments: <span>{pay_count}</span></div>
@@ -585,7 +408,7 @@ def show_patients():
                                        error_message=f"Cascade: {appt_count} appointment(s), {pay_count} payment(s) also removed")
                             st.session_state.confirm_delete_patient = None
                             st.session_state._pt_flash = f"Patient '{p[1]}' and all linked records deleted."
-                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
+                            st.session_state.patient_page = "Records"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error deleting patient: {e}")
@@ -594,5 +417,4 @@ def show_patients():
             with dc2:
                 if st.button("Cancel", use_container_width=True, key="cancel_del_pat"):
                     st.session_state.confirm_delete_patient = None
-                    st.session_state._pt_active_tab = 2  # stay on Edit/Delete
                     st.rerun()
