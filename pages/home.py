@@ -279,9 +279,6 @@ def show_dashboard():
     cursor.execute("SELECT status, COUNT(*) FROM appointments GROUP BY status")
     status_data = cursor.fetchall()
 
-    # Real data for the Performance Trends charts (last 6 months, most recent first
-    # then re-sorted chronologically) -- this used to be hardcoded mock data that
-    # never changed regardless of actual clinic activity.
     cursor.execute("""
         SELECT label, total FROM (
             SELECT TO_CHAR(appointment_date, 'Mon') AS label,
@@ -293,6 +290,7 @@ def show_dashboard():
     """)
     monthly_appt_rows = cursor.fetchall()
 
+    # Revenue: raw amounts (not divided) — chart y-axis shows actual UGX values
     cursor.execute("""
         SELECT label, revenue FROM (
             SELECT TO_CHAR(payment_date, 'Mon') AS label,
@@ -304,7 +302,6 @@ def show_dashboard():
     """)
     monthly_rev_rows = cursor.fetchall()
 
-    # Real data for "Top Treatments" -- this also used to be hardcoded mock data.
     cursor.execute("""
         SELECT treatment, COUNT(*) AS count FROM appointments
         WHERE treatment IS NOT NULL AND treatment != ''
@@ -459,9 +456,7 @@ def show_dashboard():
         ("View Reports",     "Reports",             "#EBF3FB", "#1E4A76",
          '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),
     ]
-    QA_CARD_H = 148  # approximate qa-card height in px -- nudge this if the
-    # invisible click target doesn't line up exactly with the card once you
-    # see it rendered; this is an estimate, not a measured value.
+    QA_CARD_H = 148
 
     st.markdown(f"""
     <style>
@@ -493,32 +488,21 @@ def show_dashboard():
                 st.session_state.page = page
                 st.rerun()
 
-    # ── Performance Trends — chart title baked INTO Plotly layout ─────────────
+    # ── Performance Trends ────────────────────────────────────────────────────
     st.markdown('<div class="sec-heading" style="margin-top:28px;">PERFORMANCE TRENDS</div>', unsafe_allow_html=True)
     months    = [row[0] for row in monthly_appt_rows]
     appt_vals = [int(row[1]) for row in monthly_appt_rows]
+
+    # Revenue: raw UGX values — no division, no "millions" scaling
     rev_months = [row[0] for row in monthly_rev_rows]
+    rev_vals   = [float(row[1]) for row in monthly_rev_rows]
 
-    # Pick a sensible unit (UGX / K / M) based on the actual size of the
-    # revenue figures for this period, instead of always assuming "Millions".
-    # A clinic doing UGX 200,000/month would otherwise show "0.2M", which
-    # reads oddly -- this keeps the chart readable at any revenue scale.
-    raw_rev_vals = [float(row[1]) for row in monthly_rev_rows]
-    max_rev = max(raw_rev_vals) if raw_rev_vals else 0
-    if max_rev >= 1_000_000:
-        rev_unit_divisor, rev_unit_title, rev_unit_suffix = 1_000_000, "Millions UGX", "M"
-    elif max_rev >= 1_000:
-        rev_unit_divisor, rev_unit_title, rev_unit_suffix = 1_000, "Thousands UGX", "K"
-    else:
-        rev_unit_divisor, rev_unit_title, rev_unit_suffix = 1, "UGX", ""
-    rev_vals = [v / rev_unit_divisor for v in raw_rev_vals]
-
-    CARD_BG   = '#FFFFFF'
-    BORDER    = '#E8EDF2'
-    BLUE      = '#1E4A76'
-    AMBER     = '#E88C30'
-    GRID      = '#F0F4F8'
-    MUTED     = '#8FA8BF'
+    CARD_BG = '#FFFFFF'
+    BORDER  = '#E8EDF2'
+    BLUE    = '#1E4A76'
+    AMBER   = '#E88C30'
+    GRID    = '#F0F4F8'
+    MUTED   = '#8FA8BF'
 
     def card_layout(height=300, title="", t_margin=52):
         return dict(
@@ -538,6 +522,15 @@ def show_dashboard():
                      line=dict(color=AMBER, width=3)),
             ]
         )
+
+    # Helper: format UGX amounts smartly for bar chart labels
+    def fmt_ugx(v):
+        if v >= 1_000_000:
+            return f"{v/1_000_000:.1f}M"
+        elif v >= 1_000:
+            return f"{v/1_000:.0f}K"
+        else:
+            return f"{v:,.0f}"
 
     cc1, cc2 = st.columns(2)
     with cc1:
@@ -562,13 +555,16 @@ def show_dashboard():
             fig = go.Figure(go.Bar(
                 x=rev_months, y=rev_vals,
                 marker=dict(color=AMBER, opacity=0.9, line=dict(color=BLUE, width=1)),
-                text=[f'{v:.1f}{rev_unit_suffix}' if rev_unit_suffix else f'{v:,.0f}' for v in rev_vals],
+                # Show compact labels (e.g. 1.2M or 450K) above each bar
+                text=[fmt_ugx(v) for v in rev_vals],
                 textposition='outside',
                 textfont=dict(color=BLUE, size=11)
             ))
-            fig.update_layout(**card_layout(title=f"💰  Revenue Trend ({rev_unit_title})", t_margin=60))
+            # Title no longer says "Millions" — shows actual UGX on y-axis
+            fig.update_layout(**card_layout(title="💰  Revenue Trend (UGX)", t_margin=60))
             fig.update_xaxes(showgrid=False, color=MUTED, linecolor=BORDER)
-            fig.update_yaxes(showgrid=True, gridcolor=GRID, color=MUTED, linecolor=BORDER)
+            fig.update_yaxes(showgrid=True, gridcolor=GRID, color=MUTED, linecolor=BORDER,
+                             tickformat=",")   # comma-separated thousands on y-axis
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
         else:
             st.info("No payment data yet to chart.")

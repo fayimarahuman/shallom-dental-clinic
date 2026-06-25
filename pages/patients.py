@@ -76,48 +76,25 @@ def show_patients():
             padding: 8px 20px; border-radius: 40px; z-index: 1; letter-spacing: 0.2px;
         }
 
-        /* ── TAB NAV (radio-based, persists across st.rerun) ──
-           st.tabs() does NOT remember the active tab after a manual
-           st.rerun() call - it always snaps back to the first tab.
-           A radio widget bound to session_state does persist, so we
-           use that instead and style it to look like the old tabs. */
-        div[data-testid="stRadio"] > label { display: none !important; }
-        div[data-testid="stRadio"] > div[role="radiogroup"] {
-            background: #fff !important;
-            border-radius: 16px !important;
-            border: 1.5px solid #E2E8F0 !important;
-            padding: 6px 8px !important;
-            gap: 4px !important;
-            margin-bottom: 24px !important;
+        /* ── TABS ── */
+        .stTabs [data-baseweb="tab-list"] {
+            background: #fff !important; border-radius: 16px !important;
+            border: 1.5px solid #E2E8F0 !important; padding: 6px 8px !important;
+            gap: 4px !important; margin-bottom: 24px !important;
             box-shadow: 0 2px 8px rgba(30,74,118,0.06) !important;
-            flex-direction: row !important;
         }
-        div[data-testid="stRadio"] label[data-baseweb="radio"] {
-            border-radius: 12px !important;
-            padding: 10px 26px !important;
-            margin: 0 !important;
-            transition: background 0.15s !important;
+        .stTabs [data-baseweb="tab"] {
+            border-radius: 12px !important; font-size: 13.5px !important;
+            font-weight: 500 !important; color: #6B8FAB !important;
+            padding: 10px 26px !important; transition: color 0.15s !important;
         }
-        div[data-testid="stRadio"] label[data-baseweb="radio"]:hover {
-            background: #F0F5FA !important;
-        }
-        div[data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
-            display: none !important;
-        }
-        div[data-testid="stRadio"] label[data-baseweb="radio"] div[data-testid="stMarkdownContainer"] p {
-            font-size: 13.5px !important;
-            font-weight: 500 !important;
-            color: #6B8FAB !important;
-            margin: 0 !important;
-        }
-        div[data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) {
+        .stTabs [aria-selected="true"] {
             background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
+            color: #fff !important; font-weight: 600 !important;
             box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
         }
-        div[data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) div[data-testid="stMarkdownContainer"] p {
-            color: #fff !important;
-            font-weight: 600 !important;
-        }
+        .stTabs [data-baseweb="tab-highlight"],
+        .stTabs [data-baseweb="tab-border"] { display: none !important; }
 
         /* ── SECTION LABELS ── */
         .sec-label {
@@ -156,7 +133,6 @@ def show_patients():
             background: #F8FAFD !important;
             min-height: 46px !important;
         }
-        /* Target every possible node BaseUI uses to render the selected value */
         .stSelectbox [data-baseweb="select"] *,
         .stSelectbox [data-baseweb="select"] span,
         .stSelectbox [data-baseweb="select"] div,
@@ -171,7 +147,6 @@ def show_patients():
             font-weight: 500 !important;
             -webkit-text-fill-color: #1A3A5C !important;
         }
-        /* Dropdown option list */
         [data-baseweb="popover"] li,
         [data-baseweb="menu"] li,
         [role="option"] {
@@ -210,120 +185,71 @@ def show_patients():
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(30,74,118,0.08);
         }
-        .pt-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        /* Header */
-        .pt-table thead tr {
-            background: linear-gradient(135deg, #1E4A76 0%, #2D6A9F 100%);
-        }
+        .pt-table { width: 100%; border-collapse: collapse; }
+        .pt-table thead tr { background: linear-gradient(135deg, #1E4A76 0%, #2D6A9F 100%); }
         .pt-table thead th {
-            padding: 14px 20px;
-            text-align: left;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.75);
-            white-space: nowrap;
-            border: none;
+            padding: 14px 20px; text-align: left;
+            font-size: 10.5px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            color: rgba(255,255,255,0.75); white-space: nowrap; border: none;
         }
         .pt-table thead th:first-child { border-radius: 0; }
-        /* Body rows */
-        .pt-table tbody tr {
-            border-bottom: 1px solid #F0F5FA;
-            transition: background 0.12s ease;
-        }
+        .pt-table tbody tr { border-bottom: 1px solid #F0F5FA; transition: background 0.12s ease; }
         .pt-table tbody tr:last-child { border-bottom: none; }
         .pt-table tbody tr:hover { background: #F7FAFD; }
-        .pt-table tbody td {
-            padding: 14px 20px;
-            vertical-align: middle;
-            border: none;
-        }
-        /* Cell styles */
+        .pt-table tbody td { padding: 14px 20px; vertical-align: middle; border: none; }
         .cell-id {
             display: inline-flex; align-items: center;
             background: #EEF4FB; color: #2D6A9F;
             font-size: 11px; font-weight: 700;
-            padding: 4px 10px; border-radius: 8px;
-            letter-spacing: 0.3px;
+            padding: 4px 10px; border-radius: 8px; letter-spacing: 0.3px;
         }
-        .cell-name {
-            font-size: 14px; font-weight: 600; color: #1A3A5C;
-            display: block; line-height: 1.3;
-        }
-        .cell-phone {
-            font-size: 13px; color: #2D6A9F; font-weight: 500;
-        }
-        .cell-email {
-            font-size: 12.5px; color: #7A9BB5; max-width: 180px;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            display: block;
-        }
-        .badge {
-            display: inline-block; font-size: 11px; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px; letter-spacing: 0.2px;
-        }
+        .cell-name { font-size: 14px; font-weight: 600; color: #1A3A5C; display: block; line-height: 1.3; }
+        .cell-phone { font-size: 13px; color: #2D6A9F; font-weight: 500; }
+        .cell-email { font-size: 12.5px; color: #7A9BB5; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+        .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.2px; }
         .badge-male   { background: #DBEAFE; color: #1E4A76; }
         .badge-female { background: #FDEBD3; color: #B5670F; }
         .badge-other  { background: #E2E8F0; color: #1A3A5C; }
         .cell-age {
             display: inline-flex; align-items: center; justify-content: center;
             background: #F0F5FA; color: #1A3A5C;
-            font-size: 13px; font-weight: 700;
-            width: 40px; height: 30px; border-radius: 8px;
+            font-size: 13px; font-weight: 700; width: 40px; height: 30px; border-radius: 8px;
         }
-        .cell-location {
-            font-size: 13px; color: #4B7FA8; font-weight: 500;
-        }
-        .cell-location-icon { color: #E88C30; margin-right: 4px; }
-        .cell-date {
-            font-size: 12px; color: #94A3B8; white-space: nowrap;
-        }
+        .cell-location { font-size: 13px; color: #4B7FA8; font-weight: 500; }
+        .cell-date { font-size: 12px; color: #94A3B8; white-space: nowrap; }
         .cell-dash { color: #CBD5E1; font-size: 16px; }
-        /* Table footer */
         .pt-table-footer {
-            padding: 12px 20px;
-            background: #F8FAFD;
+            padding: 12px 20px; background: #F8FAFD;
             border-top: 1px solid #E2E8F0;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .pt-table-footer-count {
-            font-size: 12.5px; font-weight: 600; color: #6B8FAB;
-        }
-        .pt-table-footer-hint {
-            font-size: 11.5px; color: #B0C4D8;
-        }
+        .pt-table-footer-count { font-size: 12.5px; font-weight: 600; color: #6B8FAB; }
+        .pt-table-footer-hint { font-size: 11.5px; color: #B0C4D8; }
 
         /* ── DELETE WARNING ── */
         .delete-warn {
             background: #FEF2F2; border: 1.5px solid #FECACA;
             border-radius: 16px; padding: 20px 24px; margin: 20px 0;
         }
-        .delete-warn-title {
-            font-size: 14px; font-weight: 700; color: #B91C1C;
-            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-        }
+        .delete-warn-title { font-size: 14px; font-weight: 700; color: #B91C1C; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .delete-field { font-size: 13px; color: #1A3A5C; margin-bottom: 6px; }
         .delete-field span { font-weight: 600; color: #1E4A76; }
         .delete-note { font-size: 12px; color: #DC2626; margin-top: 10px; font-style: italic; }
 
         /* ── EMPTY STATE ── */
-        .empty-state {
-            background: #fff; border: 1.5px dashed #CBD5E1;
-            border-radius: 20px; padding: 52px 32px; text-align: center;
-        }
+        .empty-state { background: #fff; border: 1.5px dashed #CBD5E1; border-radius: 20px; padding: 52px 32px; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
+    # ── Session state init ────────────────────────────────────────────────────
     if 'confirm_delete_patient' not in st.session_state:
         st.session_state.confirm_delete_patient = None
     if '_pt_flash' not in st.session_state:
         st.session_state._pt_flash = None
-    if 'active_tab' not in st.session_state:
-        st.session_state.active_tab = "Register"
+    # 0 = Register, 1 = Records, 2 = Edit/Delete
+    if '_pt_active_tab' not in st.session_state:
+        st.session_state._pt_active_tab = 0
 
     conn = get_connection()
     total = 0
@@ -355,17 +281,31 @@ def show_patients():
         st.success(st.session_state._pt_flash)
         st.session_state._pt_flash = None
 
-    # ── Tab bar (radio bound to session_state so it survives st.rerun()) ──
-    active_tab = st.radio(
-        "Section",
-        ["Register", "Records", "Edit / Delete"],
-        key="active_tab",
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+    # Use default_tab to restore the correct tab after a rerun
+    active = st.session_state._pt_active_tab
+    tab1, tab2, tab3 = st.tabs(["Register", "Records", "Edit / Delete"])
 
-    # ========== REGISTER ==========
-    if active_tab == "Register":
+    # ── JavaScript to auto-click the correct tab after rerun ─────────────────
+    if active != 0:
+        tab_index = active  # 0-based index
+        st.markdown(f"""
+        <script>
+        (function() {{
+            function clickTab() {{
+                var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
+                if (tabs && tabs.length > {tab_index}) {{
+                    tabs[{tab_index}].click();
+                }} else {{
+                    setTimeout(clickTab, 100);
+                }}
+            }}
+            setTimeout(clickTab, 80);
+        }})();
+        </script>
+        """, unsafe_allow_html=True)
+
+    # ========== TAB 1 - REGISTER ==========
+    with tab1:
         st.markdown('<div class="sec-label">New Patient Details</div>', unsafe_allow_html=True)
         with st.form("register_form"):
             col1, col2 = st.columns(2)
@@ -409,14 +349,15 @@ def show_patients():
                                        new_data={"name": name.strip(), "phone": phone.strip(),
                                                  "email": email.strip(), "gender": gender})
                             st.session_state._pt_flash = f"Patient '{name.strip()}' registered successfully."
+                            st.session_state._pt_active_tab = 0  # stay on Register
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error registering patient: {e}")
                         finally:
                             cur.close(); conn.close()
 
-    # ========== RECORDS ==========
-    elif active_tab == "Records":
+    # ========== TAB 2 - RECORDS ==========
+    with tab2:
         st.markdown('<div class="sec-label">Search Patients</div>', unsafe_allow_html=True)
         search_term = st.text_input(
             "Search", placeholder="Search by name, phone, email or location...",
@@ -445,19 +386,15 @@ def show_patients():
             conn.close()
 
             if data:
-                badge_map = {
-                    "Male":   "badge-male",
-                    "Female": "badge-female",
-                    "Other":  "badge-other",
-                }
+                badge_map = {"Male": "badge-male", "Female": "badge-female", "Other": "badge-other"}
                 rows = ""
                 for row in data:
                     r_id, nm, ph, em, gn, ag, loc, reg = row
-                    ph_html  = f'<span class="cell-phone">{ph}</span>'                          if ph  else '<span class="cell-dash">—</span>'
-                    em_html  = f'<span class="cell-email" title="{em}">{em}</span>'             if em  else '<span class="cell-dash">—</span>'
-                    gn_html  = f'<span class="badge {badge_map.get(gn,"badge-other")}">{gn}</span>' if gn else '<span class="cell-dash">—</span>'
-                    ag_html  = f'<span class="cell-age">{ag}</span>'                            if ag  else '<span class="cell-dash">—</span>'
-                    loc_html = f'<span class="cell-location">{loc}</span>' if loc else '<span class="cell-dash">—</span>'
+                    ph_html  = f'<span class="cell-phone">{ph}</span>'                               if ph  else '<span class="cell-dash">—</span>'
+                    em_html  = f'<span class="cell-email" title="{em}">{em}</span>'                  if em  else '<span class="cell-dash">—</span>'
+                    gn_html  = f'<span class="badge {badge_map.get(gn,"badge-other")}">{gn}</span>'  if gn  else '<span class="cell-dash">—</span>'
+                    ag_html  = f'<span class="cell-age">{ag}</span>'                                 if ag  else '<span class="cell-dash">—</span>'
+                    loc_html = f'<span class="cell-location">{loc}</span>'                           if loc else '<span class="cell-dash">—</span>'
                     rows += f"""
                     <tr>
                         <td><span class="cell-id">#{r_id}</span></td>
@@ -475,22 +412,14 @@ def show_patients():
                     <table class="pt-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Patient Name</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Gender</th>
-                                <th>Age</th>
-                                <th>Location</th>
-                                <th>Registered</th>
+                                <th>ID</th><th>Patient Name</th><th>Phone</th><th>Email</th>
+                                <th>Gender</th><th>Age</th><th>Location</th><th>Registered</th>
                             </tr>
                         </thead>
                         <tbody>{rows}</tbody>
                     </table>
                     <div class="pt-table-footer">
-                        <span class="pt-table-footer-count">
-                            {len(data)} patient{'s' if len(data) != 1 else ''} found
-                        </span>
+                        <span class="pt-table-footer-count">{len(data)} patient{'s' if len(data) != 1 else ''} found</span>
                         <span class="pt-table-footer-hint">Sorted by most recent</span>
                     </div>
                 </div>
@@ -509,8 +438,8 @@ def show_patients():
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ========== EDIT/DELETE ==========
-    elif active_tab == "Edit / Delete":
+    # ========== TAB 3 - EDIT/DELETE ==========
+    with tab3:
         conn = get_connection()
         if not conn:
             st.error("Database connection failed.")
@@ -596,6 +525,7 @@ def show_patients():
                                        new_data={"name": new_name.strip(), "phone": new_phone.strip(),
                                                  "email": new_email.strip(), "gender": new_gender})
                             st.session_state._pt_flash = f"Patient '{new_name.strip()}' updated successfully."
+                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error updating patient: {e}")
@@ -604,6 +534,7 @@ def show_patients():
 
             if delete:
                 st.session_state.confirm_delete_patient = pid
+                st.session_state._pt_active_tab = 2  # stay on Edit/Delete
 
         if st.session_state.confirm_delete_patient == pid:
             conn = get_connection()
@@ -648,6 +579,7 @@ def show_patients():
                                        error_message=f"Cascade: {appt_count} appointment(s), {pay_count} payment(s) also removed")
                             st.session_state.confirm_delete_patient = None
                             st.session_state._pt_flash = f"Patient '{p[1]}' and all linked records deleted."
+                            st.session_state._pt_active_tab = 2  # stay on Edit/Delete
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error deleting patient: {e}")
@@ -656,4 +588,5 @@ def show_patients():
             with dc2:
                 if st.button("Cancel", use_container_width=True, key="cancel_del_pat"):
                     st.session_state.confirm_delete_patient = None
+                    st.session_state._pt_active_tab = 2  # stay on Edit/Delete
                     st.rerun()
