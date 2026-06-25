@@ -76,25 +76,48 @@ def show_patients():
             padding: 8px 20px; border-radius: 40px; z-index: 1; letter-spacing: 0.2px;
         }
 
-        /* ── TABS ── */
-        .stTabs [data-baseweb="tab-list"] {
-            background: #fff !important; border-radius: 16px !important;
-            border: 1.5px solid #E2E8F0 !important; padding: 6px 8px !important;
-            gap: 4px !important; margin-bottom: 24px !important;
+        /* ── TAB NAV (radio-based, persists across st.rerun) ──
+           st.tabs() does NOT remember the active tab after a manual
+           st.rerun() call - it always snaps back to the first tab.
+           A radio widget bound to session_state does persist, so we
+           use that instead and style it to look like the old tabs. */
+        div[data-testid="stRadio"] > label { display: none !important; }
+        div[data-testid="stRadio"] > div[role="radiogroup"] {
+            background: #fff !important;
+            border-radius: 16px !important;
+            border: 1.5px solid #E2E8F0 !important;
+            padding: 6px 8px !important;
+            gap: 4px !important;
+            margin-bottom: 24px !important;
             box-shadow: 0 2px 8px rgba(30,74,118,0.06) !important;
+            flex-direction: row !important;
         }
-        .stTabs [data-baseweb="tab"] {
-            border-radius: 12px !important; font-size: 13.5px !important;
-            font-weight: 500 !important; color: #6B8FAB !important;
-            padding: 10px 26px !important; transition: color 0.15s !important;
+        div[data-testid="stRadio"] label[data-baseweb="radio"] {
+            border-radius: 12px !important;
+            padding: 10px 26px !important;
+            margin: 0 !important;
+            transition: background 0.15s !important;
         }
-        .stTabs [aria-selected="true"] {
+        div[data-testid="stRadio"] label[data-baseweb="radio"]:hover {
+            background: #F0F5FA !important;
+        }
+        div[data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
+            display: none !important;
+        }
+        div[data-testid="stRadio"] label[data-baseweb="radio"] div[data-testid="stMarkdownContainer"] p {
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            color: #6B8FAB !important;
+            margin: 0 !important;
+        }
+        div[data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) {
             background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
-            color: #fff !important; font-weight: 600 !important;
             box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
         }
-        .stTabs [data-baseweb="tab-highlight"],
-        .stTabs [data-baseweb="tab-border"] { display: none !important; }
+        div[data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) div[data-testid="stMarkdownContainer"] p {
+            color: #fff !important;
+            font-weight: 600 !important;
+        }
 
         /* ── SECTION LABELS ── */
         .sec-label {
@@ -299,6 +322,8 @@ def show_patients():
         st.session_state.confirm_delete_patient = None
     if '_pt_flash' not in st.session_state:
         st.session_state._pt_flash = None
+    if 'active_tab' not in st.session_state:
+        st.session_state.active_tab = "Register"
 
     conn = get_connection()
     total = 0
@@ -330,10 +355,17 @@ def show_patients():
         st.success(st.session_state._pt_flash)
         st.session_state._pt_flash = None
 
-    tab1, tab2, tab3 = st.tabs(["Register", "Records", "Edit / Delete"])
+    # ── Tab bar (radio bound to session_state so it survives st.rerun()) ──
+    active_tab = st.radio(
+        "Section",
+        ["Register", "Records", "Edit / Delete"],
+        key="active_tab",
+        horizontal=True,
+        label_visibility="collapsed",
+    )
 
-    # ========== TAB 1 - REGISTER ==========
-    with tab1:
+    # ========== REGISTER ==========
+    if active_tab == "Register":
         st.markdown('<div class="sec-label">New Patient Details</div>', unsafe_allow_html=True)
         with st.form("register_form"):
             col1, col2 = st.columns(2)
@@ -383,8 +415,8 @@ def show_patients():
                         finally:
                             cur.close(); conn.close()
 
-    # ========== TAB 2 - RECORDS ==========
-    with tab2:
+    # ========== RECORDS ==========
+    elif active_tab == "Records":
         st.markdown('<div class="sec-label">Search Patients</div>', unsafe_allow_html=True)
         search_term = st.text_input(
             "Search", placeholder="Search by name, phone, email or location...",
@@ -477,8 +509,8 @@ def show_patients():
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ========== TAB 3 - EDIT/DELETE ==========
-    with tab3:
+    # ========== EDIT/DELETE ==========
+    elif active_tab == "Edit / Delete":
         conn = get_connection()
         if not conn:
             st.error("Database connection failed.")
