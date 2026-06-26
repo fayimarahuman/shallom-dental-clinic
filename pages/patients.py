@@ -401,7 +401,6 @@ def show_patients():
                                        new_data={"name": name.strip(), "phone": phone.strip(),
                                                  "email": email.strip(), "gender": gender})
                             st.session_state._pt_flash = f"Patient '{name.strip()}' registered successfully."
-                            st.session_state._pt_tab = "Register"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error registering patient: {e}")
@@ -577,7 +576,6 @@ def show_patients():
                                        new_data={"name": new_name.strip(), "phone": new_phone.strip(),
                                                  "email": new_email.strip(), "gender": new_gender})
                             st.session_state._pt_flash = f"Patient '{new_name.strip()}' updated successfully."
-                            st.session_state._pt_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error updating patient: {e}")
@@ -586,7 +584,6 @@ def show_patients():
 
             if delete:
                 st.session_state.confirm_delete_patient = pid
-                st.session_state._pt_tab = "Edit / Delete"
                 st.rerun()
 
         if st.session_state.confirm_delete_patient == pid:
@@ -632,7 +629,6 @@ def show_patients():
                                        error_message=f"Cascade: {appt_count} appointment(s), {pay_count} payment(s) also removed")
                             st.session_state.confirm_delete_patient = None
                             st.session_state._pt_flash = f"Patient '{p[1]}' and all linked records deleted."
-                            st.session_state._pt_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error deleting patient: {e}")
@@ -641,5 +637,4 @@ def show_patients():
             with dc2:
                 if st.button("Cancel", use_container_width=True, key="cancel_del_pat"):
                     st.session_state.confirm_delete_patient = None
-                    st.session_state._pt_tab = "Edit / Delete"
                     st.rerun()
