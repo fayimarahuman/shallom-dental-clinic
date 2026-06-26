@@ -152,10 +152,12 @@ def show_dashboard():
     else:
         greeting = "Good evening"
 
-    # Use logged-in username from session state if available
+    # Always show "Staff" — never expose a literal logged-in username like
+    # "admin" in the greeting. If a real, non-generic display name is set in
+    # session state, use that instead (capitalised); otherwise fall back to
+    # the generic "Staff" label.
     username = st.session_state.get("username", None)
-    if username:
-        # Capitalise first letter, strip trailing whitespace
+    if username and username.strip() and username.strip().lower() != "admin":
         display_name = username.strip().capitalize()
     else:
         display_name = "Staff"
@@ -236,7 +238,7 @@ def show_dashboard():
                 </svg>
             </div>
             <div>
-                <p class="dash-title">{greeting}, {esc(display_name)} &nbsp;<span style="font-size:18px;">👋</span></p>
+                <p class="dash-title">{greeting}, {esc(display_name)}</p>
                 <p class="dash-sub">Shallom Dental Clinic &middot; {today_str} &middot; {time_str}</p>
             </div>
         </div>

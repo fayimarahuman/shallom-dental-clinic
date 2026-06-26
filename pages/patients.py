@@ -76,51 +76,67 @@ def show_patients():
             padding: 8px 20px; border-radius: 40px; z-index: 1; letter-spacing: 0.2px;
         }
 
-        /* ── CUSTOM TAB BAR (radio styled as tabs) ── */
-        div[data-testid="stHorizontalBlock"].tab-bar-row { margin-bottom: 24px !important; }
-
-        .custom-tab-bar {
+        /* ── CUSTOM TAB BAR (st.radio styled as pill tabs) ──
+           Using a radio widget instead of buttons avoids the browser's
+           "press Enter in a text field => click the first button on the
+           page" behaviour, which previously caused the Edit/Delete tab to
+           jump back to Register while typing in the search box. */
+        div[data-testid="stRadio"] {
             background: #fff;
-            border-radius: 16px;
             border: 1.5px solid #E2E8F0;
+            border-radius: 16px;
             padding: 6px 8px;
-            display: flex;
-            gap: 4px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(30,74,118,0.06);
         }
-        .custom-tab {
-            flex: 1; text-align: center;
-            padding: 10px 26px;
-            border-radius: 12px;
-            font-size: 13.5px; font-weight: 500;
-            color: #6B8FAB; cursor: pointer;
-            transition: all 0.15s;
-            border: none; background: transparent;
+        div[data-testid="stRadio"] > label[data-testid="stWidgetLabel"] {
+            display: none !important;
         }
-        .custom-tab.active {
-            background: linear-gradient(135deg, #1E4A76, #2D6A9F);
-            color: #fff; font-weight: 600;
-            box-shadow: 0 2px 10px rgba(30,74,118,0.2);
+        div[data-testid="stRadio"] div[role="radiogroup"] {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 4px;
+            flex-wrap: nowrap;
         }
-
-        /* Hide the actual radio widget — we use buttons for tabs */
-        div[data-testid="stHorizontalBlock"] .stButton > button {
-            background: transparent !important;
-            border: none !important;
+        div[data-testid="stRadio"] div[role="radiogroup"] label {
+            flex: 1 1 0;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            margin: 0 !important;
+            padding: 10px 22px !important;
             border-radius: 12px !important;
+            cursor: pointer;
+            background: transparent !important;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        div[data-testid="stRadio"] div[role="radiogroup"] label:hover {
+            background: #F0F5FA !important;
+        }
+        /* Hide the native radio dot — we style the whole pill instead */
+        div[data-testid="stRadio"] div[role="radiogroup"] label > div:first-child {
+            position: absolute !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+        div[data-testid="stRadio"] div[role="radiogroup"] label div[data-testid="stMarkdownContainer"] p,
+        div[data-testid="stRadio"] div[role="radiogroup"] label span {
             font-size: 13.5px !important;
             font-weight: 500 !important;
             color: #6B8FAB !important;
-            padding: 10px 26px !important;
-            box-shadow: none !important;
-            width: 100% !important;
-            transition: all 0.15s !important;
+            margin: 0 !important;
+            transition: color 0.15s ease;
         }
-        div[data-testid="stHorizontalBlock"] .stButton > button:hover {
-            background: #F0F5FA !important;
-            color: #1E4A76 !important;
-            transform: none !important;
+        div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
+            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
+            box-shadow: 0 2px 10px rgba(30,74,118,0.2);
+        }
+        div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p,
+        div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) span {
+            color: #fff !important;
+            font-weight: 600 !important;
         }
 
         /* ── SECTION LABELS ── */
@@ -277,14 +293,6 @@ def show_patients():
 
         /* ── EMPTY STATE ── */
         .empty-state { background: #fff; border: 1.5px dashed #CBD5E1; border-radius: 20px; padding: 52px 32px; text-align: center; }
-
-        /* ── ACTIVE TAB BUTTON OVERRIDE ── */
-        .tab-active > div > .stButton > button {
-            background: linear-gradient(135deg, #1E4A76, #2D6A9F) !important;
-            color: #fff !important;
-            font-weight: 600 !important;
-            box-shadow: 0 2px 10px rgba(30,74,118,0.2) !important;
-        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -293,8 +301,11 @@ def show_patients():
         st.session_state.confirm_delete_patient = None
     if '_pt_flash' not in st.session_state:
         st.session_state._pt_flash = None
-    if '_pt_active_tab' not in st.session_state:
-        st.session_state._pt_active_tab = "Register"
+    # Single source of truth for the active tab — bound directly to the
+    # radio widget's own key so there is never a desync between "what the
+    # widget shows" and "what the rest of the page thinks is active".
+    if '_pt_tab' not in st.session_state:
+        st.session_state._pt_tab = "Register"
 
     conn = get_connection()
     total = 0
@@ -326,25 +337,22 @@ def show_patients():
         st.success(st.session_state._pt_flash)
         st.session_state._pt_flash = None
 
-    # ── Custom Tab Bar using st.columns + st.button ───────────────────────────
-    # This replaces st.tabs() so we can control which tab is active via
-    # session_state — st.tabs() always resets to tab 0 on every rerun.
+    # ── Tab bar (st.radio styled as pill tabs) ─────────────────────────────────
+    # NOTE: deliberately NOT st.button() — buttons are real <button> elements,
+    # and pressing Enter inside any text input on the page can trigger the
+    # first button in the DOM (a known browser/Streamlit quirk). That was the
+    # cause of the Edit/Delete tab jumping back to Register while searching.
+    # st.radio has no such side effect and also gives us a single, reliable
+    # session_state key (_pt_tab) instead of juggling button clicks + reruns.
     TABS = ["Register", "Records", "Edit / Delete"]
-    active_tab = st.session_state._pt_active_tab
-
-    # Render the tab bar
-    tab_cols = st.columns(3)
-    for col, tab_name in zip(tab_cols, TABS):
-        with col:
-            # Highlight the active tab with a filled style via CSS trick:
-            # inject a wrapper div with a special class when this tab is active
-            if active_tab == tab_name:
-                st.markdown('<div class="tab-active">', unsafe_allow_html=True)
-            if st.button(tab_name, key=f"_tab_{tab_name}", use_container_width=True):
-                st.session_state._pt_active_tab = tab_name
-                st.rerun()
-            if active_tab == tab_name:
-                st.markdown('</div>', unsafe_allow_html=True)
+    st.radio(
+        "Sections",
+        TABS,
+        key="_pt_tab",
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    active_tab = st.session_state._pt_tab
 
     st.markdown("<div style='margin-bottom:8px;'></div>", unsafe_allow_html=True)
 
@@ -393,7 +401,7 @@ def show_patients():
                                        new_data={"name": name.strip(), "phone": phone.strip(),
                                                  "email": email.strip(), "gender": gender})
                             st.session_state._pt_flash = f"Patient '{name.strip()}' registered successfully."
-                            st.session_state._pt_active_tab = "Register"
+                            st.session_state._pt_tab = "Register"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error registering patient: {e}")
@@ -569,7 +577,7 @@ def show_patients():
                                        new_data={"name": new_name.strip(), "phone": new_phone.strip(),
                                                  "email": new_email.strip(), "gender": new_gender})
                             st.session_state._pt_flash = f"Patient '{new_name.strip()}' updated successfully."
-                            st.session_state._pt_active_tab = "Edit / Delete"
+                            st.session_state._pt_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error updating patient: {e}")
@@ -578,7 +586,7 @@ def show_patients():
 
             if delete:
                 st.session_state.confirm_delete_patient = pid
-                st.session_state._pt_active_tab = "Edit / Delete"
+                st.session_state._pt_tab = "Edit / Delete"
                 st.rerun()
 
         if st.session_state.confirm_delete_patient == pid:
@@ -624,7 +632,7 @@ def show_patients():
                                        error_message=f"Cascade: {appt_count} appointment(s), {pay_count} payment(s) also removed")
                             st.session_state.confirm_delete_patient = None
                             st.session_state._pt_flash = f"Patient '{p[1]}' and all linked records deleted."
-                            st.session_state._pt_active_tab = "Edit / Delete"
+                            st.session_state._pt_tab = "Edit / Delete"
                             st.rerun()
                         except Exception as e:
                             st.error(f"Error deleting patient: {e}")
@@ -633,5 +641,5 @@ def show_patients():
             with dc2:
                 if st.button("Cancel", use_container_width=True, key="cancel_del_pat"):
                     st.session_state.confirm_delete_patient = None
-                    st.session_state._pt_active_tab = "Edit / Delete"
+                    st.session_state._pt_tab = "Edit / Delete"
                     st.rerun()
