@@ -122,6 +122,20 @@ def init_database():
                     )
                 """)
                 
+                # Treatment -> inventory item mapping ("recipes"). Defines which
+                # inventory items (and how many of each) a given treatment
+                # consumes, so completing an appointment can auto-reduce stock
+                # (see pages/inventory.py: auto_reduce_inventory).
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS treatment_item_mapping (
+                        mapping_id SERIAL PRIMARY KEY,
+                        treatment_name VARCHAR(255) NOT NULL,
+                        item_name VARCHAR(255) NOT NULL,
+                        quantity_used INTEGER NOT NULL DEFAULT 1,
+                        UNIQUE (treatment_name, item_name)
+                    )
+                """)
+
                 # Audit logs table
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS audit_logs (
